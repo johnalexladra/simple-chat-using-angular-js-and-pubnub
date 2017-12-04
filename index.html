@@ -1,0 +1,119 @@
+<!doctype html>
+<html ng-app="BasicChat">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="style.css">
+    <title>Simple Chat App using AngularJS and Pubnub</title>
+    <link rel="shortcut icon" href="#">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/rltm/web/rltm.js"></script>
+    <script src="bower_components/angular-chat/angular-chat.js"></script>
+    <script src="names.js"></script>
+    <script src="app.js"></script>
+</head>
+
+<body>
+    <div ng-app="BasicChat">
+        <div class="chat-container" ng-controller="BasicController">
+            <!-- =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= -->
+            <!-- Chat Messages -->
+            <!-- =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= -->
+            <div class="chat-messages">
+                <div class="chat-header">
+                    <div class="angularjs-chat-logo" style="display: none"></div>
+                    <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Simple Chat</button>
+                </div>
+                <div class="alert alert-info">You are <strong id="whoami">Anonymous</strong></div>
+
+                <div ng-repeat="message in messages">
+
+                    <div class="sent-message {{message.user.id}} {{color.name}}" ng-class="{me: message.user.name == me.name}">
+                        <span class="username">{{ message.user.name }}:</span> {{ message.data | htmlToPlaintext }}
+                    </div>
+
+                    <div class="clear"></div>
+
+                </div>
+            </div>
+
+            <!-- =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= -->
+            <!-- User Input -->
+            <!-- =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= -->
+            <form ng-submit="send()" class="chat-input">
+                <textarea id="msg" type="text" ng-model="textbox" placeholder="Write a message here..." autofocus></textarea>
+                <input type="submit" class="send-icon" value=" ">
+                <input type="submit" value=" " class="sent-indicator {{ status }}">
+            </form>
+
+            <!-- Modal -->
+            <div class="modal fade" id="myModal" role="dialog">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Simple Chat</h4>
+                        </div>
+                        <div class="modal-body">
+                            <form class="form-inline">
+                                <div class="form-group">
+                                    <label for="name">Hero Name:</label>
+                                    <input type="text" class="form-control" id="email" placeholder="Enter your Hero Name here" ng-model="username" autofocus>
+                                </div>
+                                <button type="submit" ng-click="add()" class="btn btn-default" data-dismiss="modal">Submit</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script>
+        $.fn.ctrlEnter = function(btns, fn) {
+            var thiz = $(this);
+            btns = $(btns);
+
+            function performAction(e) {
+                fn.call(thiz, e);
+            }
+
+            thiz.bind("keydown", function(e) {
+                if (e.keyCode === 13 && e.ctrlKey) {
+                    $(this).val(function(i, val) {
+                        return val + " \n ";
+                    });
+                } else if (e.keyCode === 13) {
+                    performAction(e);
+                    e.preventDefault();
+                }
+            });
+
+            btns.bind("click", performAction);
+        }
+
+        $("#msg").ctrlEnter("input", function() {
+
+            this.submit();
+
+            return true;
+        });
+
+        function replaceLineBreaksWithHTML(string) {
+            return string !== undefined ? string.replace(/\n/g, '<br/>') : "";
+        }
+
+        function replaceHTMLWithLineBreaks(string) {
+            return string !== undefined ? string.replace(/<br\/>/gi, '\n') : "";
+        }
+    </script>
+</body>
+
+</html>

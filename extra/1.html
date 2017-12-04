@@ -1,0 +1,184 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html ng-app="helloApp">
+<head><style type="text/css">@charset "UTF-8";[ng\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide{display:none !important;}ng\:form{display:block;}.ng-animate-block-transitions{transition:0s all!important;-webkit-transition:0s all!important;}.ng-hide-add-active,.ng-hide-remove{display:block!important;}</style>
+<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hello AngularJS - Add Table Row Dynamically</title>
+<link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.20/angular.min.js"></script>
+<script src="https://hello-angularjs.appspot.com/assets/js/ui-bootstrap-tpls-0.9.0.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.18/angular-resource.js"></script>
+<!-- <script src="https://hello-angularjs.appspot.com/assets/js/controllers.js"></script> -->
+
+</head>
+<script type="text/javascript">
+var helloApp = angular.module("helloApp", ['ngResource', 'ui.bootstrap']);
+
+helloApp.config(['$httpProvider', function ($httpProvider) {    
+    $httpProvider.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded; charset=utf-8';
+}]);
+
+helloApp.controller("HelloCtrl", function($scope) {
+    $scope.name = "Calvin Hobbes";
+});
+
+
+
+helloApp.controller("CompanyCtrl", ['$scope', '$http', function($scope, $http) {
+    $scope.companies = [
+                        { 'name':'Infosys Technologies',
+                            'employees': 125000,
+                            'headoffice': 'Bangalore'},
+                            { 'name':'Cognizant Technologies',
+                                'employees': 100000,
+                                'headoffice': 'Bangalore'},
+                                { 'name':'Wipro',
+                                    'employees': 115000,
+                                    'headoffice': 'Bangalore'},
+                                    { 'name':'Tata Consultancy Services (TCS)',
+                                        'employees': 150000,
+                                        'headoffice': 'Bangalore'},                                     
+                        ];
+    
+
+    $scope.addRow = function(){     
+        $scope.companies.push({ 'name':$scope.name, 'employees': $scope.employees, 'headoffice':$scope.headoffice });       
+        $scope.name='';
+        $scope.employees='';
+        $scope.headoffice='';
+    };
+    
+    $scope.addRowAsyncAsNV = function(){        
+        $scope.companies.push({ 'name':$scope.name, 'employees': $scope.employees, 'headoffice':$scope.headoffice });
+        // Writing it to the server
+        //      
+        var data = 'name=' + $scope.name + '&employees=' + $scope.employees + '&headoffice=' + $scope.headoffice;                               
+        $http.post('/savecompany', data )
+        .success(function(data, status, headers, config) {
+            $scope.message = data;
+        })
+        .error(function(data, status, headers, config) {
+            alert( "failure message: " + JSON.stringify({data: data}));
+        });
+        // Making the fields empty
+        //
+        $scope.name='';
+        $scope.employees='';
+        $scope.headoffice='';
+    };      
+    
+    $scope.removeRow = function(name){              
+        var index = -1;     
+        var comArr = eval( $scope.companies );
+        for( var i = 0; i < comArr.length; i++ ) {
+            if( comArr[i].name === name ) {
+                index = i;
+                break;
+            }
+        }
+        if( index === -1 ) {
+            alert( "Something gone wrong" );
+        }
+        $scope.companies.splice( index, 1 );        
+    };
+    
+    
+}]);
+
+var helloAjaxApp = angular.module("helloAjaxApp", ['ui.bootstrap']);
+
+helloAjaxApp.controller("CompanyCtrl", ['$scope', '$http', function($scope, $http) {
+    $scope.companies = [
+                        { 'name':'Infosys Technologies',
+                            'employees': 125000,
+                            'headoffice': 'Bangalore'},
+                            { 'name':'Cognizant Technologies',
+                                'employees': 100000,
+                                'headoffice': 'Bangalore'},
+                                { 'name':'Wipro',
+                                    'employees': 115000,
+                                    'headoffice': 'Bangalore'},
+                                    { 'name':'Tata Consultancy Services (TCS)',
+                                        'employees': 150000,
+                                        'headoffice': 'Bangalore'},                                     
+                        ];
+    
+    $scope.addRowAsyncAsJSON = function(){      
+        $scope.companies.push({ 'name':$scope.name, 'employees': $scope.employees, 'headoffice':$scope.headoffice });
+        // Writing it to the server
+        //      
+        var dataObj = {
+                name : $scope.name,
+                employees : $scope.employees,
+                headoffice : $scope.headoffice
+        };  
+        var res = $http.post('/savecompany_json', dataObj);
+        res.success(function(data, status, headers, config) {
+            $scope.message = data;
+        });
+        res.error(function(data, status, headers, config) {
+            alert( "failure message: " + JSON.stringify({data: data}));
+        });     
+        // Making the fields empty
+        //
+        $scope.name='';
+        $scope.employees='';
+        $scope.headoffice='';
+    };
+}]);
+</script>
+
+
+<!-- Controller name goes here -->
+<body ng-controller="CompanyCtrl">
+<table class="table">
+    <tr>
+        <th>Name
+        </th>
+        <th>Employees
+        </th>
+        <th>Head Office
+        </th>
+    </tr>
+    <tr ng-repeat="company in companies">
+        <td>{{company.name}}
+        </td>
+        <td>{{company.employees}}
+        </td>
+        <td>{{company.headoffice}}
+        </td>
+    </tr>
+</table>
+    <form class="form-horizontal" role="form" ng-submit="addRow()">
+    <div class="form-group">
+        <label class="col-md-2 control-label">Name</label>
+        <div class="col-md-4">
+            <input type="text" class="form-control" name="name"
+                ng-model="name" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label">Employees</label>
+        <div class="col-md-4">
+            <input type="text" class="form-control" name="employees"
+                ng-model="employees" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label">Headoffice</label>
+        <div class="col-md-4">
+            <input type="text" class="form-control" name="headoffice"
+                ng-model="headoffice" />
+        </div>
+    </div>
+    <div class="form-group">                                
+        <div style="padding-left:110px">
+            <input type="submit" value="Submit" class="btn btn-primary"/>
+        </div>
+    </div>
+</form>
+        
+</body>
+</html>

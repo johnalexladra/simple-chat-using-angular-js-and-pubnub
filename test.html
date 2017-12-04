@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script class="jsbin" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <meta charset="UTF-8" />
+<!--
+Created using JS Bin
+http://jsbin.com
+
+Copyright (c) 2017 by anonymous (http://jsbin.com/ehaluq/47/edit)
+
+Released under the MIT license: http://jsbin.mit-license.org
+-->
+<meta name="robots" content="noindex">
+    <title>Text Box Enter</title>
+    <style>
+      body {
+        font: 16px/1.5 helvetica-neue, helvetica, arial, san-serif;
+      }
+      textarea {
+        border: 1px solid #ccc;
+        display:block;
+        width: 250px;
+        height: 100px;
+      }
+      p {
+        border: 1px solid #ccc;
+        background: #ececec;
+        padding: 10px;
+        margin: 10px 0;
+        width: 230px;
+      }
+      button {
+        border: 1px solid #ccc;
+        background: #ececec;
+        -webkit-border-radius: 3px;
+        padding: 5px 20px;
+        margin-top:10px;
+      }
+    </style>
+</head>
+<body>
+  <textarea id="msg" placeholder="Write your message here..."></textarea>
+  <input type="submit" class="send-icon" value="Submit">
+<script>
+$.fn.ctrlEnter = function (btns, fn) {
+      var thiz = $(this); 
+          btns = $(btns);
+
+      function performAction (e) {
+        fn.call(thiz, e);
+      }
+
+      thiz.bind("keydown", function (e) {
+        if (e.keyCode === 13 && e.ctrlKey) {
+        $(this).val(function(i,val){
+            return val + "<br />";
+        });
+        } else if(e.keyCode === 13) {
+          performAction(e);
+          e.preventDefault();
+        }
+      });
+
+      btns.bind("click", performAction);
+    }
+
+
+    $("#msg").ctrlEnter("button", function () {
+      $("<p></p>").append(this.val().replace(/\n/g, "<br />")).prependTo(document.body);
+      this.val("");
+    });
+
+</script>
+
+</body>
+</html>
